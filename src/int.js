@@ -26,12 +26,13 @@ function coerceInt(value) {
 }
 
 export default ({
-  typeName,
   argName,
-  transform,
-  min,
   max,
+  min,
+  sanitize,
   test,
+  transform,
+  typeName,
 }) => {
   if (!typeName) {
     throw new Error('"typeName" is required');
@@ -51,8 +52,8 @@ export default ({
       return null;
     }
 
-    if (transform) {
-      value = transform(value);
+    if (sanitize) {
+      value = sanitize(value);
       if (!isSafeInteger(value)) {
         return null;
       }
@@ -68,6 +69,10 @@ export default ({
 
     if (test && !test(value)) {
       return null;
+    }
+
+    if (transform) {
+      return transform(value);
     }
 
     return value;

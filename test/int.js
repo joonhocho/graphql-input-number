@@ -58,10 +58,10 @@ describe('GraphQLInputInt', () => {
     testEqual(schema, done, value, expected);
   });
 
-  it('transform', (done) => {
+  it('sanitize', (done) => {
     const schema = getSchema({
-      typeName: 'transform',
-      transform: (x) => 2 * x,
+      typeName: 'sanitize',
+      sanitize: (x) => 2 * x,
     });
 
     const value = 3;
@@ -154,6 +154,19 @@ describe('GraphQLInputInt', () => {
     const value = 2;
 
     testEqual(schema, done, value, value);
+  });
+
+  it('transform', (done) => {
+    const schema = getSchema({
+      typeName: 'transform',
+      max: 5,
+      transform: (x) => 2 * x,
+    });
+
+    const value = 3;
+    const expected = 6;
+
+    testEqual(schema, done, value, expected);
   });
 
   it('typeName', () => {
