@@ -16,9 +16,11 @@ function isSafeInteger(num) {
 }
 
 function coerceInt(value) {
-  const num = Number(value);
-  if (isSafeInteger(num)) {
-    return (num < 0 ? Math.ceil : Math.floor)(num);
+  if (value != null) {
+    const num = Number(value);
+    if (isSafeInteger(num)) {
+      return (num < 0 ? Math.ceil : Math.floor)(num);
+    }
   }
   return null;
 }

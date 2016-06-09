@@ -11,8 +11,13 @@ function isSafeFloat(num) {
 }
 
 function coerceFloat(value) {
-  const num = Number(value);
-  return isSafeFloat(num) ? num : null;
+  if (value != null) {
+    const num = Number(value);
+    if (isSafeFloat(num)) {
+      return num;
+    }
+  }
+  return null;
 }
 
 export default ({
