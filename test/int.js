@@ -156,11 +156,11 @@ describe('GraphQLInputInt', () => {
     testEqual(schema, done, value, value);
   });
 
-  it('transform', (done) => {
+  it('parse', (done) => {
     const schema = getSchema({
-      typeName: 'transform',
+      typeName: 'parse',
       max: 5,
-      transform: (x) => 2 * x,
+      parse: (x) => 2 * x,
     });
 
     const value = 3;
@@ -190,7 +190,7 @@ describe('GraphQLInputInt', () => {
             type: GraphQLInputInt({
               typeName: 'output',
               argName: 'output',
-              transform: (x) => 2 * x,
+              parse: (x) => 2 * x,
             }),
             resolve: () => 3,
           },
@@ -200,7 +200,7 @@ describe('GraphQLInputInt', () => {
 
     graphql(schema, '{ output }')
       .then((res) => {
-        // transform is only applied to input
+        // parse is only applied to input
         expect(res.data.output).to.equal(3);
       })
       .then(done, done);

@@ -24,9 +24,9 @@ export default ({
   argName,
   max,
   min,
+  parse,
   sanitize,
   test,
-  transform,
   typeName,
 }) => {
   if (!typeName) {
@@ -66,8 +66,8 @@ export default ({
       return null;
     }
 
-    if (transform) {
-      return transform(value);
+    if (parse) {
+      return parse(value);
     }
 
     return value;
