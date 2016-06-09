@@ -2,7 +2,18 @@ import {GraphQLScalarType} from 'graphql';
 import {GraphQLError} from 'graphql/error';
 import {Kind} from 'graphql/language';
 
-const coerceValue = (value) => value;
+
+// https://github.com/graphql/graphql-js/blob/master/src/type/scalars.js
+
+function isSafeFloat(num) {
+  return typeof num === 'number' &&
+    isFinite(num);
+}
+
+function coerceFloat(value) {
+  const num = Number(value);
+  return isSafeFloat(num) ? num : null;
+}
 
 export default ({
   typeName,
@@ -21,36 +32,47 @@ export default ({
   }
 
   const error = (value, ast, message) => {
-    throw new GraphQLError(`Argument "${argName}" has invalid value ${JSON.stringify(value)}.${message ? ` ${message}` : ''}.`, [ast]);
+    throw new GraphQLError(`Argument "${argName}" has invalid value ${JSON.stringify(value)}.${message ? ` ${message}` : ''}.`, ast ? [ast] : []);
+  };
+
+  const parseValue = (value, ast) => {
+    value = coerceFloat(value);
+    if (value == null) {
+      return null;
+    }
+
+    if (transform) {
+      value = transform(value);
+      if (!isSafeFloat(value)) {
+        return null;
+      }
+    }
+
+    if (min != null && value < min) {
+      error(value, ast, `Expected minimum "${min}"`);
+    }
+
+    if (max != null && value > max) {
+      error(value, ast, `Expected maximum "${max}"`);
+    }
+
+    if (test && !test(value)) {
+      return null;
+    }
+
+    return value;
   };
 
   return new GraphQLScalarType({
     name: typeName,
-    serialize: coerceValue,
-    parseValue: coerceValue,
+    serialize: coerceFloat,
+    parseValue,
     parseLiteral(ast) {
-      let {kind, value} = ast;
-      if (kind !== Kind.FLOAT) {
-        error(value, ast, 'Expected type "Float"');
+      const {kind, value} = ast;
+      if (kind === Kind.FLOAT || kind === Kind.INT) {
+        return parseValue(value, ast);
       }
-
-      if (transform) {
-        value = transform(value);
-      }
-
-      if (min != null && value < min) {
-        error(value, ast, `Expected minimum "${min}"`);
-      }
-
-      if (max != null && value > max) {
-        error(value, ast, `Expected maximum "${max}"`);
-      }
-
-      if (test && !test(value)) {
-        error(value, ast);
-      }
-
-      return value;
+      return null;
     },
   });
 };
