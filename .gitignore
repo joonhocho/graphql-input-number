@@ -38,4 +38,5 @@ jspm_packages
 
 # Compiled source
 lib
-testout
+coverage
+.nyc_output
