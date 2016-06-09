@@ -21,7 +21,7 @@ export default ({
   }
 
   const error = (value, ast, message) => {
-    throw new GraphQLError(`Argument "${argName}" has invalid value ${JSON.stringify(value)}.${message ? ' ' + message : ''}.`, [ast]);
+    throw new GraphQLError(`Argument "${argName}" has invalid value ${JSON.stringify(value)}.${message ? ` ${message}` : ''}.`, [ast]);
   };
 
   return new GraphQLScalarType({
@@ -42,7 +42,7 @@ export default ({
         error(value, ast, `Expected minimum "${min}"`);
       }
 
-      if (max != null && value > max){
+      if (max != null && value > max) {
         error(value, ast, `Expected maximum "${max}"`);
       }
 

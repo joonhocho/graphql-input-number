@@ -1,6 +1,6 @@
 {
   "name": "graphql-input-number",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A configurable custom input number type for GraphQL with sanitization and validation.",
   "main": "lib/index.js",
   "scripts": {
@@ -8,6 +8,7 @@
     "build-watch": "babel src --watch --out-dir lib",
     "clear": "rm -rf ./lib ./coverage ./.nyc_output",
     "coverage": "nyc npm test && nyc report --reporter=text-lcov | coveralls",
+    "nyc": "nyc npm test && nyc report --reporter=lcov",
     "prepublish": "npm run clear && npm test",
     "pretest": "npm run build",
     "start": "npm test",

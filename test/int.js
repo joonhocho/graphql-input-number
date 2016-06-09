@@ -155,4 +155,41 @@ describe('GraphQLInputInt', () => {
 
     testEqual(schema, done, value, value);
   });
+
+  it('typeName', () => {
+    expect(() => GraphQLInputInt({
+      argName: 'a',
+    })).to.throw(/typeName/);
+  });
+
+  it('argName', () => {
+    expect(() => GraphQLInputInt({
+      typeName: 'a',
+    })).to.throw(/argName/);
+  });
+
+  it('serialize', (done) => {
+    const schema = new GraphQLSchema({
+      query: new GraphQLObjectType({
+        name: 'Query',
+        fields: {
+          output: {
+            type: GraphQLInputInt({
+              typeName: 'output',
+              argName: 'output',
+              transform: (x) => 2 * x,
+            }),
+            resolve: () => 3,
+          },
+        },
+      }),
+    });
+
+    graphql(schema, '{ output }')
+      .then((res) => {
+        // transform is only applied to input
+        expect(res.data.output).to.equal(3);
+      })
+      .then(done, done);
+  });
 });

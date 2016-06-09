@@ -155,4 +155,41 @@ describe('GraphQLInputFloat', () => {
 
     testEqual(schema, done, value, value);
   });
+
+  it('typeName', () => {
+    expect(() => GraphQLInputFloat({
+      argName: 'a',
+    })).to.throw(/typeName/);
+  });
+
+  it('argName', () => {
+    expect(() => GraphQLInputFloat({
+      typeName: 'a',
+    })).to.throw(/argName/);
+  });
+
+  it('serialize', (done) => {
+    const schema = new GraphQLSchema({
+      query: new GraphQLObjectType({
+        name: 'Query',
+        fields: {
+          output: {
+            type: GraphQLInputFloat({
+              typeName: 'output',
+              argName: 'output',
+              transform: (x) => 2 * x,
+            }),
+            resolve: () => 3.1,
+          },
+        },
+      }),
+    });
+
+    graphql(schema, '{ output }')
+      .then((res) => {
+        // transform is only applied to input
+        expect(res.data.output).to.equal(3.1);
+      })
+      .then(done, done);
+  });
 });
