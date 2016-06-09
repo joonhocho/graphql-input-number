@@ -1,0 +1,51 @@
+{
+  "name": "graphql-input-number",
+  "version": "0.0.1",
+  "description": "A configurable custom input number type for GraphQL with sanitization and validation.",
+  "main": "lib/index.js",
+  "scripts": {
+    "clear": "rm -rf ./lib/ ./testout/",
+    "build": "babel src --out-dir lib",
+    "build-watch": "babel src --watch --out-dir lib",
+    "start": "npm run clear && npm run build && npm run test-build && npm run test",
+    "test-build": "babel test --out-dir testout",
+    "test-build-watch": "babel test --watch --out-dir testout",
+    "test": "mocha testout/**/*.js",
+    "test-watch": "mocha --watch testout/**/*.js",
+    "watch": "npm run build-watch & npm run test-build-watch & npm run test-watch",
+    "update-D": "npm install --save-dev babel-cli@latest babel-preset-es2015@latest babel-preset-stage-0@latest chai@latest mocha@latest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/joonhocho/graphql-input-number.git"
+  },
+  "keywords": [
+    "configurable",
+    "custom",
+    "input",
+    "number",
+    "scalar",
+    "type",
+    "GraphQL",
+    "sanitization",
+    "validation."
+  ],
+  "author": "Joon Ho Cho",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/joonhocho/graphql-input-number/issues"
+  },
+  "homepage": "https://github.com/joonhocho/graphql-input-number#readme",
+  "peerDependencies": {
+    "graphql": "*"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "babel-cli": "^6.9.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-stage-0": "^6.5.0",
+    "chai": "^3.5.0",
+    "graphql": "*",
+    "mocha": "^2.5.3"
+  }
+}
