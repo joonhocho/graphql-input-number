@@ -17,10 +17,7 @@ const getSchema = (options) => new GraphQLSchema({
         type: GraphQLInt,
         args: {
           value: {
-            type: GraphQLInputInt({
-              argName: 'value',
-              ...options,
-            }),
+            type: GraphQLInputInt(options),
           },
         },
         resolve: (_, {value}) => value,
@@ -30,13 +27,14 @@ const getSchema = (options) => new GraphQLSchema({
 });
 
 
-const testEqual = (schema, done, value, expected) =>
+const runQuery = (schema, value) =>
   graphql(schema, `{ input(value: ${JSON.stringify(value)}) }`)
-    .then((res) => {
-      expect(res.data.input).to.equal(expected);
-    })
-    .then(done, done);
+    .then((res) => res.data.input);
 
+const testEqual = (schema, done, value, expected) =>
+  runQuery(schema, value)
+    .then((input) => { expect(input).to.eql(expected); })
+    .then(done, done);
 
 const testError = (schema, done, value, expected) =>
   graphql(schema, `{ input(value: ${JSON.stringify(value)}) }`)
@@ -49,7 +47,7 @@ const testError = (schema, done, value, expected) =>
 describe('GraphQLInputInt', () => {
   it('default', (done) => {
     const schema = getSchema({
-      typeName: 'default',
+      name: 'default',
     });
 
     const value = 3;
@@ -60,7 +58,7 @@ describe('GraphQLInputInt', () => {
 
   it('sanitize', (done) => {
     const schema = getSchema({
-      typeName: 'sanitize',
+      name: 'sanitize',
       sanitize: (x) => 2 * x,
     });
 
@@ -72,17 +70,17 @@ describe('GraphQLInputInt', () => {
 
   it('non-int bad', (done) => {
     const schema = getSchema({
-      typeName: 'NonInt',
+      name: 'NonInt',
     });
 
     const value = '3';
 
-    testError(schema, done, value, /type/);
+    testError(schema, done, value, /type/i);
   });
 
   it('non-int ok', (done) => {
     const schema = getSchema({
-      typeName: 'NonInt',
+      name: 'NonInt',
     });
 
     const value = 3;
@@ -92,18 +90,18 @@ describe('GraphQLInputInt', () => {
 
   it('min bad', (done) => {
     const schema = getSchema({
-      typeName: 'min',
+      name: 'min',
       min: 3,
     });
 
     const value = 2;
 
-    testError(schema, done, value, /minimum.*3/);
+    testError(schema, done, value, /minimum.*3/i);
   });
 
   it('min ok', (done) => {
     const schema = getSchema({
-      typeName: 'min',
+      name: 'min',
       min: 3,
     });
 
@@ -114,18 +112,18 @@ describe('GraphQLInputInt', () => {
 
   it('max bad', (done) => {
     const schema = getSchema({
-      typeName: 'max',
+      name: 'max',
       max: 5,
     });
 
     const value = 6;
 
-    testError(schema, done, value, /maximum.*5/);
+    testError(schema, done, value, /maximum.*5/i);
   });
 
   it('max ok', (done) => {
     const schema = getSchema({
-      typeName: 'max',
+      name: 'max',
       max: 5,
     });
 
@@ -136,18 +134,18 @@ describe('GraphQLInputInt', () => {
 
   it('test bad', (done) => {
     const schema = getSchema({
-      typeName: 'test',
+      name: 'test',
       test: (x) => x < 3,
     });
 
     const value = 3;
 
-    testError(schema, done, value, /invalid/);
+    testError(schema, done, value, /invalid/i);
   });
 
   it('test ok', (done) => {
     const schema = getSchema({
-      typeName: 'test',
+      name: 'test',
       test: (x) => x < 3,
     });
 
@@ -156,9 +154,25 @@ describe('GraphQLInputInt', () => {
     testEqual(schema, done, value, value);
   });
 
+  it('error', (done) => {
+    const schema = getSchema({
+      name: 'error',
+      min: 3,
+      error: (err) => err.value - 3,
+    });
+
+    const value = 2;
+
+    runQuery(schema, value)
+      .then((input) => {
+        expect(input).to.equal(-1);
+      })
+      .then(done, done);
+  });
+
   it('parse', (done) => {
     const schema = getSchema({
-      typeName: 'parse',
+      name: 'parse',
       max: 5,
       parse: (x) => 2 * x,
     });
@@ -169,16 +183,10 @@ describe('GraphQLInputInt', () => {
     testEqual(schema, done, value, expected);
   });
 
-  it('typeName', () => {
+  it('name', () => {
     expect(() => GraphQLInputInt({
-      argName: 'a',
-    })).to.throw(/typeName/);
-  });
-
-  it('argName', () => {
-    expect(() => GraphQLInputInt({
-      typeName: 'a',
-    })).to.throw(/argName/);
+      // name is required
+    })).to.throw(/name/i);
   });
 
   it('serialize', (done) => {
@@ -188,8 +196,7 @@ describe('GraphQLInputInt', () => {
         fields: {
           output: {
             type: GraphQLInputInt({
-              typeName: 'output',
-              argName: 'output',
+              name: 'output',
               parse: (x) => 2 * x,
             }),
             resolve: () => 3,

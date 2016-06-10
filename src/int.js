@@ -26,31 +26,36 @@ function coerceInt(value) {
 }
 
 export default ({
-  argName,
+  error,
   max,
   min,
   parse,
   sanitize,
   test,
-  typeName,
+  name,
 }) => {
-  if (!typeName) {
-    throw new Error('"typeName" is required');
+  if (!name) {
+    throw new Error('"name" is required');
   }
 
-  if (!argName) {
-    throw new Error('"argName" is required');
+  if (typeof error !== 'function') {
+    error = ({value, ast, message}) => {
+      const more = message ? ` ${message}.` : '';
+      throw new GraphQLError(
+        `Invalid value ${JSON.stringify(value)}.${more}`,
+        ast ? [ast] : []
+      );
+    };
   }
-
-  const error = (value, ast, message) => {
-    throw new GraphQLError(`Argument "${argName}" has invalid value ${JSON.stringify(value)}.${message ? ` ${message}` : ''}.`, ast ? [ast] : []);
-  };
 
   const parseValue = (value, ast) => {
     value = coerceInt(value);
     if (value == null) {
       return null;
     }
+
+
+    // Sanitization Phase
 
     if (sanitize) {
       value = sanitize(value);
@@ -59,17 +64,40 @@ export default ({
       }
     }
 
+
+    // Validation Phase
+
     if (min != null && value < min) {
-      error(value, ast, `Expected minimum "${min}"`);
+      return error({
+        type: 'min',
+        value,
+        min,
+        message: `Expected minimum "${min}"`,
+        ast,
+      });
     }
 
     if (max != null && value > max) {
-      error(value, ast, `Expected maximum "${max}"`);
+      return error({
+        type: 'max',
+        value,
+        max,
+        message: `Expected maximum "${max}"`,
+        ast,
+      });
     }
 
     if (test && !test(value)) {
-      return null;
+      return error({
+        type: 'test',
+        value,
+        test,
+        ast,
+      });
     }
+
+
+    // Parse Phase
 
     if (parse) {
       return parse(value);
@@ -79,7 +107,7 @@ export default ({
   };
 
   return new GraphQLScalarType({
-    name: typeName,
+    name,
     serialize: coerceInt,
     parseValue,
     parseLiteral(ast) {
