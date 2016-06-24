@@ -7,6 +7,8 @@
 
 A configurable custom input number type for GraphQL with sanitization and validation.
 
+Checkout [graphql-input-string](https://github.com/joonhocho/graphql-input-string) for validating string inputs.
+
 
 ### Install
 ```
