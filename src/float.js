@@ -28,6 +28,7 @@ export default ({
   sanitize,
   test,
   name,
+  description,
 }) => {
   if (!name) {
     throw new Error('"name" is required');
@@ -103,6 +104,7 @@ export default ({
 
   return new GraphQLScalarType({
     name,
+    description,
     serialize: coerceFloat,
     parseValue,
     parseLiteral(ast) {
