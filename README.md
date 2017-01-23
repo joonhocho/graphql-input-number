@@ -78,6 +78,10 @@ GraphQLInputInt({
   // value.
   // May throw an error or return a value.
   parse: ((number) => any) = null,
+
+  // If you want to pass some config to type constructor, simply add them here.
+  // For example,
+  description: string,
 });
 
 GraphQLInputFloat({
