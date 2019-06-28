@@ -1,3 +1,6 @@
+# Checkout new TypeScript rewrite version with some breaking changes
+[joonhocho/graphql-scalar](https://github.com/joonhocho/graphql-scalar)
+
 # graphql-input-number
 [![Build Status](https://travis-ci.org/joonhocho/graphql-input-number.svg?branch=master)](https://travis-ci.org/joonhocho/graphql-input-number)
 [![Coverage Status](https://coveralls.io/repos/github/joonhocho/graphql-input-number/badge.svg?branch=master)](https://coveralls.io/github/joonhocho/graphql-input-number?branch=master)
